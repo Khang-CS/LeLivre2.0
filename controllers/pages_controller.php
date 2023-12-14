@@ -1,5 +1,7 @@
 <?php
 require_once('controllers/base_controller.php');
+require_once('models/admin.php');
+require_once('models/customer_model.php');
 // require_once('models/admin.php');
 
 class PagesController extends BaseController
@@ -11,8 +13,145 @@ class PagesController extends BaseController
 
     public function home()
     {
-        $this->render('home');
+        $bookList = Book::getLatestBook();
+        $data = array(
+            'bookList' => $bookList
+        );
+
+
+        $this->render('home', $data);
     }
+
+    public function about()
+    {
+        $this->render('about');
+    }
+
+    public function shop()
+    {
+
+        //Filter book
+        if (isset($_POST['filter_book'])) {
+            $bookList = Book::filterBook($_POST['Publisher_ID'], $_POST['Author_ID'], $_POST['Genre_ID']);
+            $publisherList = Publisher::getPublisherList();
+            $genreList = Genre::getGenreList();
+            $authorList = Author::getAuthorList();
+
+            $data = array(
+                'bookList' => $bookList,
+                'publisherList' => $publisherList,
+                'authorList' => $authorList,
+                'genreList' => $genreList
+            );
+
+            $this->render('shop', $data);
+        } //
+
+        // Search book        
+        else if (isset($_POST['search_book'])) {
+            $bookList = Book::searchBook($_POST['searchInfo']);
+            $publisherList = Publisher::getPublisherList();
+            $genreList = Genre::getGenreList();
+            $authorList = Author::getAuthorList();
+
+            $data = array(
+                'bookList' => $bookList,
+                'publisherList' => $publisherList,
+                'authorList' => $authorList,
+                'genreList' => $genreList
+            );
+
+            $this->render('shop', $data);
+        }
+
+        $bookList = Book::getBookList();
+        $publisherList = Publisher::getPublisherList();
+        $genreList = Genre::getGenreList();
+        $authorList = Author::getAuthorList();
+
+        $data = array(
+            'bookList' => $bookList,
+            'publisherList' => $publisherList,
+            'authorList' => $authorList,
+            'genreList' => $genreList,
+        );
+        $this->render('shop', $data);
+    }
+
+    // NOT USED AT THE MOMENT
+    public function search()
+    {
+        $bookList = Book::getBookList();
+        $data = array(
+            'bookList' => $bookList
+        );
+        $this->render('search', $data);
+    }
+
+    // NOT USED
+    public function contact()
+    {
+        $this->render('contact');
+    }
+
+    public function detail()
+    {
+        if (isset($_GET['ID'])) {
+
+            //if comment
+            if (isset($_POST['comment'])) {
+                $Book_ID = $_POST['Book_ID'];
+                $Account_ID = $_POST['Account_ID'];
+                $Content = $_POST['Content'];
+                $Ratings = $_POST['Ratings'];
+                $Img = 'User.png';
+
+                $Create_date = date("Y-m-d H:i:s");
+
+                Reviews::insertReview($Create_date, $Account_ID, $Book_ID, $Content, $Ratings, $Img);
+            }
+            /////////
+            $Book_ID = $_GET['ID'];
+            $book = Book::getBook_useBookID($Book_ID);
+            $Publisher = Publisher::getPublisher_useBookID($Book_ID);
+
+            //Author handler
+            $authorList = Author::getAuthorList_useBookID($Book_ID);
+            $author_string = "";
+            foreach ($authorList as $author) {
+                $author_string = $author_string . $author->Author_name . ", ";
+            }
+            $authorList = substr($author_string, 0, strlen($author_string) - 2);
+            //
+
+            //Genre handler
+            $genreList = Genre::getGenreList_useBookID($Book_ID);
+            $genre_string = "";
+            foreach ($genreList as $genre) {
+                $genre_string = $genre_string . $genre->Genre_name . ", ";
+            }
+            $genreList = substr($genre_string, 0, strlen($genre_string) - 2);
+            //
+
+            $reviewList = Reviews::getReviews_useBook_ID($Book_ID);
+
+            $data = array(
+                'book' => $book,
+                'Publisher' => $Publisher,
+                'authorList' => $authorList,
+                'genreList' => $genreList,
+                'reviewList' => $reviewList
+            );
+            $this->render('detail', $data);
+        }
+    }
+
+    public function cart()
+    {
+        $this->render('cart');
+    }
+
+
 
     public function error()
     {

@@ -195,6 +195,7 @@ CREATE TABLE REVIEWS
 (
     Create_date DATETIME,
     Account_ID INT,
+    Book_ID INT,
     Content VARCHAR(255),
     Ratings INT,
     Img VARCHAR(255),
@@ -408,6 +409,10 @@ WITH CHECK ADD CONSTRAINT fk_order_detail_book_id FOREIGN KEY ([Book_ID]) REFERE
 GO
 ALTER TABLE [REVIEWS]
 WITH CHECK ADD CONSTRAINT fk_reviews_account_id FOREIGN KEY ([Account_ID]) REFERENCES [ACCOUNT]([Account_ID])
+
+GO
+ALTER TABLE [REVIEWS]
+WITH CHECK ADD CONSTRAINT fk_reviews_book_id FOREIGN KEY ([Book_ID]) REFERENCES [BOOK]([Book_ID])
 
 -- TABLE CART
 GO

@@ -1,8 +1,22 @@
 <?php
 
 
-class Admin
+class Account
 {
+    public $Account_ID, $FName, $LName, $Email, $TelephoneNum, $H_Password, $Birthday, $Address_M, $Deleted;
+
+    function __construct($Account_ID, $FName, $LName, $Email, $TelephoneNum, $H_Password, $Birthday, $Address_M, $Deleted)
+    {
+        $this->Account_ID = $Account_ID;
+        $this->FName = $FName;
+        $this->LName = $LName;
+        $this->Email = $Email;
+        $this->TelephoneNum = $TelephoneNum;
+        $this->H_Password = $H_Password;
+        $this->Birthday = $Birthday;
+        $this->Address_M = $Address_M;
+        $this->Deleted = $Deleted;
+    }
 }
 
 class Author
@@ -518,5 +532,108 @@ class Book
 
     static function searchBook($searchInfo)
     {
+        $list = [];
+        $db = DB::getInstance();
+        $Book_name = $searchInfo;
+        $Publisher_name = $searchInfo;
+        $Author_name = $searchInfo;
+        $Genre_name = $searchInfo;
+
+
+        // SUB QUERY
+        $sql = "SELECT Book_ID
+                FROM BOOK
+                WHERE Book_ID IN (
+                SELECT BOOK.Book_ID
+                FROM BOOK, PUBLISHER, PUBLISH, AUTHOR, WRITE, GENRE, BELONGS_TO
+                WHERE BOOK.Book_ID = PUBLISH.Book_ID AND PUBLISH.Publisher_ID = PUBLISHER.Publisher_ID AND BOOK.Book_ID = WRITE.Book_ID AND WRITE.Author_ID = AUTHOR.Author_ID AND BOOK.Book_ID = BELONGS_TO.Book_ID AND BELONGS_TO.Genre_ID = GENRE.Genre_ID AND (Book_name = :Book_name OR Publisher_name = :Publisher_name OR Author_name = :Author_name OR Genre_name = :Genre_name))";
+        //
+
+        $stmt = $db->prepare($sql);
+
+        $params = [
+            'Book_name' => $Book_name,
+            'Publisher_name' => $Publisher_name,
+            'Author_name' => $Author_name,
+            'Genre_name' => $Genre_name
+        ];
+
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($items as $item) {
+            $list[] = Book::getBook_useBookID($item['Book_ID']);
+        }
+
+        return $list;
+    }
+
+    static function filterBook($Publisher_ID, $Author_ID, $Genre_ID)
+    {
+        if ($Publisher_ID === '0' && $Author_ID === '0' && $Genre_ID === '0') {
+            return Book::getBookList();
+        }
+
+        $db = DB::getInstance();
+
+        $stringPublisher = ($Publisher_ID === '0') ? "" : "PUBLISHER.Publisher_ID = :Publisher_ID AND ";
+        $stringAuthor = ($Author_ID === '0') ? "" : "AUTHOR.Author_ID = :Author_ID AND ";
+        $stringGenre = ($Genre_ID === '0') ? "" : "GENRE.Genre_ID = :Genre_ID AND ";
+
+        $sql = "SELECT Book_ID
+                FROM BOOK
+                WHERE Book_ID IN (
+                SELECT BOOK.Book_ID
+                FROM BOOK, PUBLISHER, PUBLISH, AUTHOR, WRITE, GENRE, BELONGS_TO
+                WHERE BOOK.Book_ID = PUBLISH.Book_ID AND PUBLISH.Publisher_ID = PUBLISHER.Publisher_ID AND BOOK.Book_ID = WRITE.Book_ID AND WRITE.Author_ID = AUTHOR.Author_ID AND BOOK.Book_ID = BELONGS_TO.Book_ID AND BELONGS_TO.Genre_ID = GENRE.Genre_ID AND " . $stringPublisher . $stringAuthor . $stringGenre;
+
+        $sql = substr($sql, 0, strlen($sql) - 5) . ")";
+
+        $stmt = $db->prepare($sql);
+
+
+        if ($Publisher_ID !== '0') {
+            $stmt->bindParam(':Publisher_ID', $Publisher_ID, PDO::PARAM_STR);
+        }
+
+        if ($Author_ID !== '0') {
+            $stmt->bindParam(':Author_ID', $Author_ID, PDO::PARAM_STR);
+        }
+
+        if ($Genre_ID !== '0') {
+            $stmt->bindParam(':Genre_ID', $Genre_ID, PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
+
+        $list = [];
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($items as $item) {
+            $list[] = Book::getBook_useBookID($item['Book_ID']);
+        }
+
+        return $list;
+    }
+
+    static function getLatestBook()
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT TOP 6 * FROM BOOK ORDER BY Book_ID DESC"; //CHANGE 6 TO ANY OTHER NUMBER (3,2,1,....)
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute();
+
+        $list = [];
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($items as $item) {
+            $list[] = new Book($item['Book_ID'], $item['Book_name'], $item['O_Price'], $item['Discount'], $item['Price'], $item['Publish_year'], $item['Ratings'], $item['Thumbnail'], $item['Reviews_N'], $item['Quantity'], $item['Deleted'], $item['Description']);
+        }
+
+        return $list;
     }
 }

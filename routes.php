@@ -3,7 +3,7 @@
 # routes.php
 
 $controllers = array(
-    'pages' => ['home', 'error'],
+    'pages' => ['home', 'about', 'search', 'shop', 'detail', 'cart', 'contact', 'error'],
     'adminPages' => [
         'home', 'manageAuthor', 'manageGenre', 'managePublisher', 'manageBook', 'manageBookDetail'
     ],

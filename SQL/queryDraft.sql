@@ -69,3 +69,17 @@ GO
 -- SELECT*
 -- FROM BOOK
 
+
+
+-- SELECT Book_ID
+-- FROM BOOK
+-- WHERE Book_ID IN (
+-- SELECT BOOK.Book_ID
+-- FROM BOOK, PUBLISHER, PUBLISH, AUTHOR, WRITE, GENRE, BELONGS_TO
+-- WHERE BOOK.Book_ID = PUBLISH.Book_ID AND PUBLISH.Publisher_ID = PUBLISHER.Publisher_ID AND BOOK.Book_ID = WRITE.Book_ID AND WRITE.Author_ID = AUTHOR.Author_ID AND BOOK.Book_ID = BELONGS_TO.Book_ID AND BELONGS_TO.Genre_ID = GENRE.Genre_ID AND (Book_name = 'Tet O Lang Dia Nguc' OR Genre_name = 'Business' ))
+
+DELETE FROM REVIEWS WHERE Account_ID = 11
+
+-- SELECT COUNT(*) AS row_count
+-- FROM REVIEWS
+-- WHERE Book_ID = 53;

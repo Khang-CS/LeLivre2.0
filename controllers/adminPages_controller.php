@@ -206,6 +206,43 @@ class AdminPagesController extends BaseController
             unlink('./assets/book_image/' . $Thumbnail);
         }
 
+        // search book
+        else if (isset($_POST['search_book'])) {
+            $bookList = Book::searchBook($_POST['searchInfo']);
+            $publisherList = Publisher::getPublisherList();
+            $genreList = Genre::getGenreList();
+            $authorList = Author::getAuthorList();
+
+            $data = array(
+                'bookList' => $bookList,
+                'publisherList' => $publisherList,
+                'authorList' => $authorList,
+                'genreList' => $genreList,
+                'message' => $message
+            );
+
+            $this->render('manageBook', $data);
+        }
+
+        //Filter book
+        else if (isset($_POST['filter_book'])) {
+            $bookList = Book::filterBook($_POST['Publisher_ID'], $_POST['Author_ID'], $_POST['Genre_ID']);
+            $publisherList = Publisher::getPublisherList();
+            $genreList = Genre::getGenreList();
+            $authorList = Author::getAuthorList();
+
+            $data = array(
+                'bookList' => $bookList,
+                'publisherList' => $publisherList,
+                'authorList' => $authorList,
+                'genreList' => $genreList,
+                'message' => $message
+            );
+
+            $this->render('manageBook', $data);
+        }
+        //
+
         $bookList = Book::getBookList();
         $publisherList = Publisher::getPublisherList();
         $genreList = Genre::getGenreList();

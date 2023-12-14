@@ -32,87 +32,6 @@ if (!isset($user_id)) {
     <?php include 'admin_header.php'; ?>
 
     <!-- product CRUD section starts  -->
-
-    <section class="add-products">
-        <form action="" method="post" enctype="multipart/form-data">
-            <h3>Search book</h3>
-            <input type="text" name="searchInfo" class="box" placeholder="search book...." required>
-            <input type="submit" value="search" name="search_book" class="btn">
-        </form>
-    </section>
-
-    <section class="add-products">
-        <form action="" method="post" enctype="multipart/form-data">
-            <h3>Filter</h3>
-            <div style="width: 50%; height: 45px; float: left;" class="box">
-                <label for="Publisher">Publisher:</label>
-                <select id="Publisher" name="Publisher_ID">
-                    <?php if (!empty($publisherList)) {
-                        foreach ($publisherList as $publisher) {
-                    ?>
-                            <option value="<?php echo $publisher->Publisher_ID; ?>">
-                                <?php $Publisher_name = $publisher->Publisher_name;
-                                if (strlen($Publisher_name) > 16) {
-                                    echo substr($Publisher_name, 0, 16);
-                                } else {
-                                    echo $Publisher_name;
-                                }
-                                ?>
-                            </option>
-                    <?php
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div style="width: 50%; height: 45px; float: left;" class="box">
-                <label for="Genre">Genre:</label>
-                <select id="Genre" name="Genre_ID">
-                    <?php if (!empty($genreList)) {
-                        foreach ($genreList as $genre) {
-                    ?>
-                            <option value="<?php echo $genre->Genre_ID; ?>">
-                                <?php $Genre_name = $genre->Genre_name;
-                                if (strlen($Genre_name) > 16) {
-                                    echo substr($Genre_name, 0, 16);
-                                } else {
-                                    echo $Genre_name;
-                                }
-                                ?>
-                            </option>
-                    <?php
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div style="width: 50%; height: 45px; float: left;" class="box">
-                <label for="Author">Author:</label>
-                <select id="Author" name="Author_ID">
-                    <?php if (!empty($authorList)) {
-                        foreach ($authorList as $author) {
-                    ?>
-                            <option value="<?php echo $author->Author_ID; ?>">
-                                <?php $Author_name = $author->Author_name;
-                                if (strlen($Author_name) > 16) {
-                                    echo substr($Author_name, 0, 16);
-                                } else {
-                                    echo $Author_name;
-                                }
-                                ?>
-                            </option>
-                    <?php
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-            <input type="submit" value="Filter" name="filter_book" class="btn">
-        </form>
-    </section>
-
     <section class="add-products">
 
         <h1 class="title">manage books</h1>
@@ -154,6 +73,89 @@ if (!isset($user_id)) {
 
     </section>
 
+    <section class="add-products">
+        <form action="" method="post" enctype="multipart/form-data">
+            <h3>Search book</h3>
+            <input type="text" name="searchInfo" class="box" placeholder="search book...." required>
+            <input type="submit" value="search" name="search_book" class="btn">
+        </form>
+    </section>
+
+    <section class="add-products">
+        <form action="" method="post" enctype="multipart/form-data">
+            <h3>Filter</h3>
+            <div style="width: 50%; height: 45px; float: left;" class="box">
+                <label for="Publisher">Publisher:</label>
+                <select id="Publisher" name="Publisher_ID">
+                    <option value='0' selected>All</option>
+                    <?php if (!empty($publisherList)) {
+                        foreach ($publisherList as $publisher) {
+                    ?>
+                            <option value="<?php echo $publisher->Publisher_ID; ?>">
+                                <?php $Publisher_name = $publisher->Publisher_name;
+                                if (strlen($Publisher_name) > 16) {
+                                    echo substr($Publisher_name, 0, 16);
+                                } else {
+                                    echo $Publisher_name;
+                                }
+                                ?>
+                            </option>
+                    <?php
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <div style="width: 50%; height: 45px; float: left;" class="box">
+                <label for="Genre">Genre:</label>
+                <select id="Genre" name="Genre_ID">
+                    <option value='0' selected>All</option>
+                    <?php if (!empty($genreList)) {
+                        foreach ($genreList as $genre) {
+                    ?>
+                            <option value="<?php echo $genre->Genre_ID; ?>">
+                                <?php $Genre_name = $genre->Genre_name;
+                                if (strlen($Genre_name) > 16) {
+                                    echo substr($Genre_name, 0, 16);
+                                } else {
+                                    echo $Genre_name;
+                                }
+                                ?>
+                            </option>
+                    <?php
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <div style="width: 50%; height: 45px; float: left;" class="box">
+                <label for="Author">Author:</label>
+                <select id="Author" name="Author_ID">
+                    <option value='0' selected>All</option>
+                    <?php if (!empty($authorList)) {
+                        foreach ($authorList as $author) {
+                    ?>
+                            <option value="<?php echo $author->Author_ID; ?>">
+                                <?php $Author_name = $author->Author_name;
+                                if (strlen($Author_name) > 16) {
+                                    echo substr($Author_name, 0, 16);
+                                } else {
+                                    echo $Author_name;
+                                }
+                                ?>
+                            </option>
+                    <?php
+                        }
+                    }
+                    ?>
+                    <option value='0' selected>All</option>
+                </select>
+            </div>
+            <input type="submit" value="Filter" name="filter_book" class="btn">
+        </form>
+    </section>
 
 
     <!-- product CRUD section ends -->
