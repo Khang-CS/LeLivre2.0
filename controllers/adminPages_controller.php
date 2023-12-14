@@ -208,10 +208,14 @@ class AdminPagesController extends BaseController
 
         $bookList = Book::getBookList();
         $publisherList = Publisher::getPublisherList();
+        $genreList = Genre::getGenreList();
+        $authorList = Author::getAuthorList();
 
         $data = array(
             'bookList' => $bookList,
             'publisherList' => $publisherList,
+            'authorList' => $authorList,
+            'genreList' => $genreList,
             'message' => $message
         );
 

@@ -515,4 +515,8 @@ class Book
 
         $stmt->execute($params);
     }
+
+    static function searchBook($searchInfo)
+    {
+    }
 }
