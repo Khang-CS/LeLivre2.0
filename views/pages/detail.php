@@ -25,34 +25,34 @@ if (!isset($user_id)) {
     <link rel="stylesheet" href="../assets/css/style.css">
 
     <style>
-    .pTitle {
-        font-size: 30px;
-    }
+        .pTitle {
+            font-size: 30px;
+        }
 
-    .pInfo {
-        font-size: 20px;
-    }
+        .pInfo {
+            font-size: 20px;
+        }
 
-    .sale {
-        color: red;
-    }
+        .sale {
+            color: red;
+        }
 
-    .white {
-        background-color: white;
-    }
+        .white {
+            background-color: white;
+        }
 
-    .qty {
-        height: 30px;
-        border-radius: 5px;
-        border: 1px solid black;
-        margin: 10px;
-        padding-left: 5px;
-        font-size: 20px;
-    }
+        .qty {
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid black;
+            margin: 10px;
+            padding-left: 5px;
+            font-size: 20px;
+        }
 
-    .title {
-        font-size: 30px;
-    }
+        .title {
+            font-size: 30px;
+        }
     </style>
 
 </head>
@@ -75,8 +75,8 @@ if (!isset($user_id)) {
                 <div class="pInfo"><?php echo $book->O_Price; ?>$</div>
                 <?php if ($book->Discount > 0) {
                 ?>
-                <div class="pTitle sale">Sale off: <?php echo $book->Discount . "%"; ?></div>
-                <div class="pInfo"><?php echo $book->Price; ?>$</div>;
+                    <div class="pTitle sale">Sale off: <?php echo $book->Discount . "%"; ?></div>
+                    <div class="pInfo"><?php echo $book->Price; ?>$</div>;
                 <?php
                 }
                 ?>
@@ -109,7 +109,7 @@ if (!isset($user_id)) {
                     $nonrate = 5 - $rate;
                     while ($rate !== 0) {
                     ?>
-                    <i class="fa-sharp fa-solid fa-star fa-2xl" style="color: #ffc800;"></i>
+                        <i class="fa-sharp fa-solid fa-star fa-2xl" style="color: #ffc800;"></i>
                     <?php
                         $rate = $rate - 1;
                     }
@@ -118,33 +118,33 @@ if (!isset($user_id)) {
                     <?php
                     while ($nonrate !== 0) {
                     ?>
-                    <i class="fa-sharp fa-regular fa-star fa-2xl" style="color: #ffc800;"></i>
+                        <i class="fa-sharp fa-regular fa-star fa-2xl" style="color: #ffc800;"></i>
                     <?php
                         $nonrate = $nonrate - 1;
                     }
                     ?>
                 </div>
 
-                <input name="Book_ID" type="hidden" value="<?php echo $book->Book_ID; ?>">
-
-
-
-
                 <!-- <i class=" fa-regular fa-star-half-stroke fa-2xl" style="color: #ffc800;"></i> -->
 
                 <p><?php echo $book->Description; ?></p>
 
-                <input type="number" min="1" name="product_quantity" value="1" class="qty">
+                <input type="number" min="1" name="Quantity" value="1" class="qty">
+
+                <input name="Price" type="hidden" value="<?php echo $book->Price; ?>">
+                <input name="Book_ID" type="hidden" value="<?php echo $book->Book_ID; ?>">
+                <input name="Customer_ID" type="hidden" value="<?php echo $user_id; ?>">
+                >
 
                 <?php
                 if ($book->Quantity > 0) {
                 ?>
-                <input type="submit" value="add to cart" name="add_to_cart" class="btn">
+                    <input type="submit" value="add to cart" name="add_to_cart" class="btn">
                 <?php
                 } else {
                 ?>
 
-                <div class="pTitle sale">OUT OF STOCK !</div>
+                    <div class="pTitle sale">OUT OF STOCK !</div>
                 <?php
                 } ?>
 
@@ -159,8 +159,7 @@ if (!isset($user_id)) {
         <form action="" method="post">
             <h3>say something about this book!</h3>
             <input type="number" min="1" max="5" name="Ratings" value="1" class="box" required>
-            <textarea name="Content" class="box" placeholder="enter your message" id="" cols="30" rows="10"
-                required></textarea>
+            <textarea name="Content" class="box" placeholder="enter your message" id="" cols="30" rows="10" required></textarea>
 
             <input type="hidden" name="Account_ID" value="<?php echo $_SESSION['user_id']; ?>">
             <input type="hidden" name="Book_ID" value="<?php echo $book->Book_ID; ?>">
@@ -178,12 +177,12 @@ if (!isset($user_id)) {
             if (!empty($reviewList)) {
                 foreach ($reviewList as $review) {
             ?>
-            <div class="box">
-                <img src="../assets/comment_image/User.png" alt="">
-                <p><?php echo $review->Content; ?></p>
-                <div class="stars">
+                    <div class="box">
+                        <img src="../assets/comment_image/User.png" alt="">
+                        <p><?php echo $review->Content; ?></p>
+                        <div class="stars">
 
-                    <?php
+                            <?php
                             $rate = 0;
                             if ($review->Ratings !== '0') {
                                 $rate = $review->Ratings;
@@ -191,24 +190,24 @@ if (!isset($user_id)) {
                             $nonrate = 5 - $rate;
                             while ($rate !== 0) {
                             ?>
-                    <i class="fa-sharp fa-solid fa-star fa-2xl" style="color: #ffc800;"></i>
-                    <?php
+                                <i class="fa-sharp fa-solid fa-star fa-2xl" style="color: #ffc800;"></i>
+                            <?php
                                 $rate = $rate - 1;
                             }
                             ?>
 
-                    <?php
+                            <?php
                             while ($nonrate !== 0) {
                             ?>
-                    <i class="fa-sharp fa-regular fa-star fa-2xl" style="color: #ffc800;"></i>
-                    <?php
+                                <i class="fa-sharp fa-regular fa-star fa-2xl" style="color: #ffc800;"></i>
+                            <?php
                                 $nonrate = $nonrate - 1;
                             }
                             ?>
-                </div>
-                <h3>Date: <?php echo $review->Create_date; ?></h3>
-                <h3><?php echo $review->Account_name; ?></h3>
-            </div>
+                        </div>
+                        <h3>Date: <?php echo $review->Create_date; ?></h3>
+                        <h3><?php echo $review->Account_name; ?></h3>
+                    </div>
             <?php
                 }
             }

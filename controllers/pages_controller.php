@@ -99,6 +99,7 @@ class PagesController extends BaseController
         if (isset($_GET['ID'])) {
 
             //if comment
+            $message = [];
             if (isset($_POST['comment'])) {
                 $Book_ID = $_POST['Book_ID'];
                 $Account_ID = $_POST['Account_ID'];
@@ -109,6 +110,19 @@ class PagesController extends BaseController
                 $Create_date = date("Y-m-d H:i:s");
 
                 Reviews::insertReview($Create_date, $Account_ID, $Book_ID, $Content, $Ratings, $Img);
+
+                $message[] = "You have just commented !";
+            }
+
+            //add to cart
+            if (isset($_POST['add_to_cart'])) {
+                $Price = $_POST['Price'];
+                $Quantity = $_POST['Quantity'];
+                $Book_ID = $_POST['Book_ID'];
+                $Customer_ID = $_POST['Customer_ID'];
+
+                Cart::addBookToCart($Customer_ID, $Price, $Quantity, $Book_ID);
+                $message[] = "Book is added to cart !";
             }
             /////////
             $Book_ID = $_GET['ID'];
@@ -140,7 +154,8 @@ class PagesController extends BaseController
                 'Publisher' => $Publisher,
                 'authorList' => $authorList,
                 'genreList' => $genreList,
-                'reviewList' => $reviewList
+                'reviewList' => $reviewList,
+                'message' => $message
             );
             $this->render('detail', $data);
         }
@@ -148,7 +163,34 @@ class PagesController extends BaseController
 
     public function cart()
     {
-        $this->render('cart');
+        if (isset($_POST['delete_cart_detail'])) {
+            $Cart_detail_ID = $_POST['Cart_detail_ID'];
+
+            Cart_detail::deleteCartDetail($Cart_detail_ID);
+        }
+
+        if (isset($_POST['update_cart_detail'])) {
+            $Cart_detail_ID = $_POST['Cart_detail_ID'];
+            $Quantity = $_POST['Quantity'];
+            $Price = $_POST['Price'];
+
+            Cart_detail::updateCartDetail($Cart_detail_ID, $Price, $Quantity);
+        }
+
+        if (isset($_POST['delete_all'])) {
+            echo "haha";
+        }
+        $Customer_ID = $_GET['userID'];
+
+        $cartInfo = Cart::getCart($Customer_ID);
+
+        // $list = $cartInfo->Cart_detail_list;
+        // echo $list[0]->book->Thumbnail;
+
+        $data = [
+            'cartInfo' => $cartInfo
+        ];
+        $this->render('cart', $data);
     }
 
 

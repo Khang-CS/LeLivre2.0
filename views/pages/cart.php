@@ -31,7 +31,7 @@ if (!isset($user_id)) {
 
     <div class="heading">
         <h3>shopping cart</h3>
-        <p> <a href="home.php">home</a> / cart </p>
+        <p> <a href="./index.php">home</a> / cart </p>
     </div>
 
     <section class="shopping-cart">
@@ -41,27 +41,40 @@ if (!isset($user_id)) {
         <div class="box-container">
             <?php
             $grand_total = 0;
-            $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-            if (mysqli_num_rows($select_cart) > 0) {
-                while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
+            $Cart_detail_list = $cartInfo->Cart_detail_list;
+            if (!empty($Cart_detail_list)) {
+                foreach ($Cart_detail_list as $Cart_detail) {
             ?>
-            <div class="box">
-                <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times"
-                    onclick="return confirm('delete this from cart?');"></a>
-                <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
-                <div class="name"><?php echo $fetch_cart['name']; ?></div>
-                <div class="price">$<?php echo $fetch_cart['price']; ?>/-</div>
-                <form action="" method="post">
-                    <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
-                    <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>">
-                    <input type="submit" name="update_cart" value="update" class="option-btn">
-                </form>
-                <div class="sub-total"> sub total :
-                    <span>$<?php echo $sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']); ?>/-</span>
-                </div>
-            </div>
+                    <div class="box">
+                        <img style="height: 200px;" src="../assets/book_image/<?php echo $Cart_detail->book->Thumbnail; ?>" alt="">
+                        <div class="name"><?php
+                                            $Book_name = $Cart_detail->book->Book_name;
+                                            if (strlen($Book_name) > 20) {
+                                                echo substr($Book_name, 0, 20);
+                                            } else {
+                                                echo $Book_name;
+                                            }
+                                            ?></div>
+                        <div class="price"><?php echo $Cart_detail->Price; ?>$</div>
+                        <form action="" method="post">
+                            <input type="hidden" name="Cart_detail_ID" value="<?php echo $Cart_detail->Cart_detail_ID; ?>">
+                            <input type="hidden" name="Price" value="<?php echo $Cart_detail->book->Price; ?>">
+
+                            <input type="number" min="1" name="Quantity" value="<?php echo $Cart_detail->Quantity; ?>">
+
+                            <input type="submit" name="update_cart_detail" value="update" class="option-btn">
+
+                            <input class="fas fa-times" value="X" type="submit" name="delete_cart_detail" onclick="return confirm('delete this from cart?');">
+
+                        </form>
+                        <div class="sub-total"> sub total :
+                            <span><?php
+                                    $subTotal = $Cart_detail->Total_cost;
+                                    echo $subTotal; ?>$</span>
+                        </div>
+                    </div>
             <?php
-                    $grand_total += $sub_total;
+                    $grand_total += $subTotal;
                 }
             } else {
                 echo '<p class="empty">your cart is empty</p>';
@@ -69,16 +82,18 @@ if (!isset($user_id)) {
             ?>
         </div>
 
-        <div style="margin-top: 2rem; text-align:center;">
-            <a href="cart.php?delete_all" class="delete-btn <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>"
-                onclick="return confirm('delete all from cart?');">delete all</a>
-        </div>
+        <form action="" method="post" class="box">
+            <div style=" margin-top: 2rem; text-align:center;">
+                <input type="submit" style="text-align: center;" value="Delete all" name="delete_all" class="delete-btn" onclick="return confirm('delete all from cart?');">
+            </div>
+        </form>
+
 
         <div class="cart-total">
-            <p>grand total : <span>$<?php echo $grand_total; ?>/-</span></p>
+            <p>Grand total : <span><?php echo $grand_total; ?>$</span></p>
             <div class="flex">
-                <a href="shop.php" class="option-btn">continue shopping</a>
-                <a href="checkout.php" class="btn <?php echo ($grand_total > 1) ? '' : 'disabled'; ?>">proceed to
+                <a href="index.php?controller=pages&action=shop" class="option-btn">continue shopping</a>
+                <a href="checkout.php" class="btn">proceed to
                     checkout</a>
             </div>
         </div>

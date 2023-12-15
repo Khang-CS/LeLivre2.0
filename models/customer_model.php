@@ -151,3 +151,229 @@ class Reviews
         return $list;
     }
 }
+
+class Cart_detail
+{
+    public $Cart_detail_ID;
+    public $Price;
+    public $Quantity;
+    public $Total_cost;
+    public $Cart_ID;
+    public $book;
+
+    function __construct($Cart_detail_ID, $Price, $Quantity, $Total_cost, $Cart_ID, $book)
+    {
+        $this->Cart_detail_ID = $Cart_detail_ID;
+        $this->Price = $Price;
+        $this->Quantity = $Quantity;
+        $this->Total_cost = $Total_cost;
+        $this->$Cart_ID = $Cart_ID;
+        $this->book = $book; //class Book
+    }
+
+    static function checkIfBookIsAdded($Cart_ID, $Book_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT Cart_detail_ID FROM CART_DETAIL WHERE Cart_ID = :Cart_ID AND Book_ID = :Book_ID";
+
+        $stmt = $db->prepare($sql);
+        $params = [
+            'Cart_ID' => $Cart_ID,
+            'Book_ID' => $Book_ID
+        ];
+        $stmt->execute($params);
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($items)) {
+            $item = $items[0];
+            return $item['Cart_detail_ID'];
+        }
+
+        return 0;
+    }
+
+    static function getCartDetail_useCartDetailID($Cart_detail_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT* FROM CART_DETAIL WHERE Cart_detail_ID = :Cart_detail_ID";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Cart_detail_ID', $Cart_detail_ID, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $item = $items[0];
+
+        $book = Book::getBook_useBookID($item['Book_ID']);
+
+        return new Cart_detail($item['Cart_detail_ID'], $item['Price'], $item['Quantity'], $item['Total_cost'], $item['Cart_ID'], $book);
+    }
+
+    static function createNewCartDetail($Price, $Quantity, $Cart_ID, $Book_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "INSERT INTO CART_DETAIL (Price, Quantity, Cart_ID, Book_ID) VALUES (:Price, :Quantity, :Cart_ID, :Book_ID)";
+
+        $stmt = $db->prepare($sql);
+
+        $params = [
+            'Price' => $Price,
+            'Quantity' => $Quantity,
+            'Cart_ID' => $Cart_ID,
+            'Book_ID' => $Book_ID
+        ];
+
+        $stmt->execute($params);
+    }
+
+    static function updateCartDetail($Cart_detail_ID, $Price, $Quantity)
+    {
+        $db = DB::getInstance();
+        $sql = "UPDATE CART_DETAIL SET Price = :Price, Quantity = :Quantity WHERE Cart_detail_ID = :Cart_detail_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $params = [
+            'Cart_detail_ID' => $Cart_detail_ID,
+            'Price' => $Price,
+            'Quantity' => $Quantity
+        ];
+
+        $stmt->execute($params);
+    }
+
+    static function getCartDetailList($Customer_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT Cart_detail_ID FROM CART INNER JOIN CART_DETAIL ON CART.Cart_ID = CART_DETAIL.Cart_ID WHERE CART.Customer_ID = :Customer_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $list[] = Cart_detail::getCartDetail_useCartDetailID($item['Cart_detail_ID']);
+            }
+        }
+
+        return $list;
+    }
+
+    static function deleteCartDetail($Cart_detail_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "DELETE FROM CART_DETAIL WHERE Cart_detail_ID = :Cart_detail_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(':Cart_detail_ID', $Cart_detail_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+}
+
+class Cart
+{
+    public $Cart_ID;
+    public $Customer_ID;
+    public $Cart_detail_list;
+
+    function __construct($Customer_ID, $Cart_detail_list)
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT * FROM CART WHERE Customer_ID = :Customer_ID";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+        $stmt->execute();
+        $items = $stmt->fetchAll(PDO::PARAM_STR);
+        if (!empty($items)) {
+            $item = $items[0];
+            $Cart_ID = $item['Cart_ID'];
+            $this->Cart_ID = $Cart_ID;
+        } else {
+            $newCart_sql = "INSERT INTO CART(Customer_ID) VALUES (:Customer_ID)";
+            $newCart_stmt = $db->prepare($newCart_sql);
+            $newCart_stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+            $newCart_stmt->execute();
+
+            $sql = "SELECT * FROM CART WHERE Customer_ID = :Customer_ID";
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+            $stmt->execute();
+            $items = $stmt->fetchAll(PDO::PARAM_STR);
+            $item = $items[0];
+
+            $Cart_ID = $item['Cart_ID'];
+            $this->Cart_ID = $Cart_ID;
+        }
+
+        $this->Customer_ID = $Customer_ID;
+        $this->Cart_detail_list = $Cart_detail_list;
+    }
+
+    static function createNewCart($Customer_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "INSERT INTO CART (Customer_ID) VALUES (:Customer_ID)";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+    static function getCartID_useCustomerID($Customer_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT * FROM CART WHERE Customer_ID = :Customer_ID";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::PARAM_STR);
+
+        if (!empty($items)) {
+            $item = $items[0];
+
+            return $item['Cart_ID'];
+        }
+
+        Cart::createNewCart($Customer_ID);
+
+        return Cart::getCartID_useCustomerID($Customer_ID);
+    }
+
+    static function addBookToCart($Customer_ID, $Price, $Quantity, $Book_ID)
+    {
+        $Cart_ID = Cart::getCartID_useCustomerID($Customer_ID);
+
+        $checkExist = Cart_detail::checkIfBookIsAdded($Cart_ID, $Book_ID);
+
+        if ($checkExist) {
+            $Cart_detail_ID = $checkExist;
+            $Cart_detail_old = Cart_detail::getCartDetail_useCartDetailID($Cart_detail_ID);
+
+            $newPrice = $Price;
+            $newQuantity = $Cart_detail_old->Quantity + $Quantity;
+
+            Cart_detail::updateCartDetail($Cart_detail_ID, $newPrice, $newQuantity);
+        }
+        // If book was never added
+        else {
+            Cart_detail::createNewCartDetail($Price, $Quantity, $Cart_ID, $Book_ID);
+        }
+    }
+
+    static function getCart($Customer_ID)
+    {
+        $Cart_detail_list = Cart_detail::getCartDetailList($Customer_ID);
+
+        return new Cart($Customer_ID, $Cart_detail_list);
+    }
+}

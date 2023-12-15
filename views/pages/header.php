@@ -1,3 +1,17 @@
+<?php
+if (isset($message)) {
+    if (!empty($message)) {
+        foreach ($message as $message) {
+            echo '
+      <div class="message">
+         <span>' . $message . '</span>
+         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+      </div>
+      ';
+        }
+    }
+}
+?>
 <header class="header">
 
     <div class="header-1">
@@ -32,7 +46,7 @@
                 // $select_cart_number = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
                 // $cart_rows_number = mysqli_num_rows($select_cart_number); 
                 ?>
-                <a href="index.php?controller=pages&action=cart"> <i class="fas fa-shopping-cart"></i>
+                <a href="index.php?controller=pages&action=cart&userID=<?php echo $_SESSION['user_id']; ?>"> <i class="fas fa-shopping-cart"></i>
                     <span>(3)</span> </a>
             </div>
 

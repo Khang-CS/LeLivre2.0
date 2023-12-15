@@ -673,6 +673,20 @@ BEGIN
         INNER JOIN INSERTED ON CART_DETAIL.Cart_detail_ID = INSERTED.Cart_detail_ID;
 END;
 
+--- Update Lại CART_DETAIL.Total_cost sau khi Price và Quantity update--
+GO
+CREATE TRIGGER UpdateTotalCostCartDetail
+ON CART_DETAIL
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE CART_DETAIL
+    SET Total_cost = INSERTED.Price * INSERTED.Quantity
+    FROM CART_DETAIL
+        INNER JOIN INSERTED ON CART_DETAIL.Cart_detail_ID = INSERTED.Cart_detail_ID;
+END;
+
 -- TABLE ORDER
 -- Create_date phải nhỏ hơn hoặc bằng ngày giờ hiện tại.
 -- Total_price phải lớn hơn 0.
