@@ -178,19 +178,82 @@ class PagesController extends BaseController
         }
 
         if (isset($_POST['delete_all'])) {
-            echo "haha";
+            $Cart_ID = $_POST['Cart_ID'];
+            Cart::emptyCart($Cart_ID);
         }
         $Customer_ID = $_GET['userID'];
 
         $cartInfo = Cart::getCart($Customer_ID);
 
-        // $list = $cartInfo->Cart_detail_list;
-        // echo $list[0]->book->Thumbnail;
 
         $data = [
             'cartInfo' => $cartInfo
         ];
         $this->render('cart', $data);
+    }
+
+    public function checkout()
+    {
+        $message = [];
+        if (isset($_POST['order'])) {
+
+            $Cart_ID = $_POST['Cart_ID'];
+
+            $Customer_ID = $_GET['userID'];
+            $Address_M = $_POST['Address_M'];
+            $Create_date = date("Y-m-d H:i:s");
+            $Status_M = 0;
+            $Total_price = Cart::getTotalPrice($Cart_ID);
+            $Note = $_POST['Note'];
+            $Shipping_ID = $_POST['Method_ID'];
+            $Payment_ID = $_POST['Payment_ID'];
+
+            $cartInfo = Cart::getCart($Customer_ID);
+
+            Order::createNewOrder($Customer_ID, $Address_M, $Create_date, $Status_M, $Total_price, $Note, $Shipping_ID, $Payment_ID, $cartInfo);
+
+            $message[] = "Your order has been sent !";
+        }
+        $Customer_ID = $_GET['userID'];
+
+        $cartInfo = Cart::getCart($Customer_ID);
+        $customerInfo = Customer::findAccount_useAccountID($Customer_ID);
+        $paymentList = Payment_method::getPaymentList();
+        $shippingList = Shipping_method::getShippingList();
+
+
+        $data = [
+            'cartInfo' => $cartInfo,
+            'customerInfo' => $customerInfo,
+            'paymentList' => $paymentList,
+            'shippingList' => $shippingList,
+            'message' => $message
+        ];
+
+        $this->render('checkout', $data);
+    }
+
+    public function orders()
+    {
+
+        if (isset($_POST['received'])) {
+            $Order_ID = $_POST['Order_ID'];
+            Order::updateOrderStatus($Order_ID, 2);
+        }
+
+        if (isset($_POST['cancel'])) {
+            $Order_ID = $_POST['Order_ID'];
+            Order::updateOrderStatus($Order_ID, 3);
+        }
+        $Customer_ID = $_GET['userID'];
+        $orderPlacedList = Order::getOrderPlaced($Customer_ID);
+        $Customer = Customer::findAccount_useAccountID($Customer_ID);
+
+        $data = array(
+            'orderPlacedList' => $orderPlacedList,
+            'Customer' => $Customer
+        );
+        $this->render('orders', $data);
     }
 
 

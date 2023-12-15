@@ -45,9 +45,10 @@ if (!isset($user_id)) {
             if (!empty($Cart_detail_list)) {
                 foreach ($Cart_detail_list as $Cart_detail) {
             ?>
-                    <div class="box">
-                        <img style="height: 200px;" src="../assets/book_image/<?php echo $Cart_detail->book->Thumbnail; ?>" alt="">
-                        <div class="name"><?php
+            <div class="box">
+                <img style="height: 200px;" src="../assets/book_image/<?php echo $Cart_detail->book->Thumbnail; ?>"
+                    alt="">
+                <div class="name"><?php
                                             $Book_name = $Cart_detail->book->Book_name;
                                             if (strlen($Book_name) > 20) {
                                                 echo substr($Book_name, 0, 20);
@@ -55,24 +56,25 @@ if (!isset($user_id)) {
                                                 echo $Book_name;
                                             }
                                             ?></div>
-                        <div class="price"><?php echo $Cart_detail->Price; ?>$</div>
-                        <form action="" method="post">
-                            <input type="hidden" name="Cart_detail_ID" value="<?php echo $Cart_detail->Cart_detail_ID; ?>">
-                            <input type="hidden" name="Price" value="<?php echo $Cart_detail->book->Price; ?>">
+                <div class="price"><?php echo $Cart_detail->Price; ?>$</div>
+                <form action="" method="post">
+                    <input type="hidden" name="Cart_detail_ID" value="<?php echo $Cart_detail->Cart_detail_ID; ?>">
+                    <input type="hidden" name="Price" value="<?php echo $Cart_detail->book->Price; ?>">
 
-                            <input type="number" min="1" name="Quantity" value="<?php echo $Cart_detail->Quantity; ?>">
+                    <input type="number" min="1" name="Quantity" value="<?php echo $Cart_detail->Quantity; ?>">
 
-                            <input type="submit" name="update_cart_detail" value="update" class="option-btn">
+                    <input type="submit" name="update_cart_detail" value="update" class="option-btn">
 
-                            <input class="fas fa-times" value="X" type="submit" name="delete_cart_detail" onclick="return confirm('delete this from cart?');">
+                    <input class="fas fa-times" value="X" type="submit" name="delete_cart_detail"
+                        onclick="return confirm('delete this from cart?');">
 
-                        </form>
-                        <div class="sub-total"> sub total :
-                            <span><?php
+                </form>
+                <div class="sub-total"> sub total :
+                    <span><?php
                                     $subTotal = $Cart_detail->Total_cost;
                                     echo $subTotal; ?>$</span>
-                        </div>
-                    </div>
+                </div>
+            </div>
             <?php
                     $grand_total += $subTotal;
                 }
@@ -84,7 +86,9 @@ if (!isset($user_id)) {
 
         <form action="" method="post" class="box">
             <div style=" margin-top: 2rem; text-align:center;">
-                <input type="submit" style="text-align: center;" value="Delete all" name="delete_all" class="delete-btn" onclick="return confirm('delete all from cart?');">
+                <input type="hidden" name="Cart_ID" value="<?php echo $cartInfo->Cart_ID; ?>">
+                <input type="submit" style="text-align: center;" value="Delete all" name="delete_all" class="delete-btn"
+                    onclick="return confirm('delete all from cart?');">
             </div>
         </form>
 
@@ -93,7 +97,8 @@ if (!isset($user_id)) {
             <p>Grand total : <span><?php echo $grand_total; ?>$</span></p>
             <div class="flex">
                 <a href="index.php?controller=pages&action=shop" class="option-btn">continue shopping</a>
-                <a href="checkout.php" class="btn">proceed to
+                <a href="index.php?controller=pages&action=checkout&userID=<?php echo $user_id; ?>" class="btn">proceed
+                    to
                     checkout</a>
             </div>
         </div>

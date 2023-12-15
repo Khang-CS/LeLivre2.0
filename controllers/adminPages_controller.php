@@ -1,6 +1,8 @@
 <?php
 require_once('controllers/base_controller.php');
 require_once('models/admin.php');
+require_once('models/customer_model.php');
+
 
 class AdminPagesController extends BaseController
 {
@@ -436,6 +438,24 @@ class AdminPagesController extends BaseController
 
 
         $this->render('manageBookDetail');
+    }
+
+    public function manageOrders()
+    {
+
+        if (isset($_POST['update_order'])) {
+            $Order_ID = $_POST['Order_ID'];
+            $Status_M = $_POST['Status_M'];
+
+            Order::updateOrderStatus($Order_ID, $Status_M);
+        }
+        $orderInfoList = Order::getAllOrdersInfo();
+
+        $data = array(
+            'orderInfoList' => $orderInfoList
+        );
+
+        $this->render('manageOrders', $data);
     }
 
     public function error()

@@ -3,9 +3,9 @@
 # routes.php
 
 $controllers = array(
-    'pages' => ['home', 'about', 'search', 'shop', 'detail', 'cart', 'contact', 'error'],
+    'pages' => ['home', 'about', 'search', 'shop', 'detail', 'cart', 'checkout', 'orders', 'contact', 'error'],
     'adminPages' => [
-        'home', 'manageAuthor', 'manageGenre', 'managePublisher', 'manageBook', 'manageBookDetail'
+        'home', 'manageAuthor', 'manageGenre', 'managePublisher', 'manageBook', 'manageBookDetail', 'manageOrders'
     ],
     'log' => ['login', 'register', 'logout']
 );

@@ -35,7 +35,7 @@ if (isset($message)) {
                 <a href="index.php?controller=pages&action=about">about</a>
                 <a href="index.php?controller=pages&action=shop">shop</a>
                 <a href="index.php?controller=pages&action=contact">contact</a>
-                <a href="orders.php">orders</a>
+                <a href="index.php?controller=pages&action=orders&userID=<?php echo $_SESSION['user_id']; ?>">orders</a>
             </nav>
 
             <div class="icons">

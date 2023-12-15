@@ -25,10 +25,7 @@ if (isset($message)) {
             <a href="index.php?controller=adminPages&action=manageAuthor">Author</a>
             <a href="index.php?controller=adminPages&action=manageGenre">Genre</a>
             <a href="index.php?controller=adminPages&action=managePublisher">Publisher</a>
-            <a href="admin_orders.php">Orders</a>
-            <a href="admin_users.php">Users</a>
-            <a href="admin_users.php">Staffs</a>
-            <a href="admin_contacts.php">Messages</a>
+            <a href="index.php?controller=adminPages&action=manageOrders">Orders</a>
         </nav>
 
         <div class="icons">

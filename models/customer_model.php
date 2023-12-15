@@ -159,7 +159,7 @@ class Cart_detail
     public $Quantity;
     public $Total_cost;
     public $Cart_ID;
-    public $book;
+    public $book; //class Book
 
     function __construct($Cart_detail_ID, $Price, $Quantity, $Total_cost, $Cart_ID, $book)
     {
@@ -375,5 +375,369 @@ class Cart
         $Cart_detail_list = Cart_detail::getCartDetailList($Customer_ID);
 
         return new Cart($Customer_ID, $Cart_detail_list);
+    }
+
+    static function getTotalPrice($Cart_ID)
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT SUM(Total_cost) as Total_cost FROM CART_DETAIL WHERE Cart_ID = :Cart_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(':Cart_ID', $Cart_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $item = $items[0];
+
+        return $item['Total_cost'];
+    }
+
+    static function emptyCart($Cart_ID)
+    {
+        $db = DB::getInstance();
+        $sql = "DELETE FROM CART_DETAIL WHERE Cart_ID = :Cart_ID";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Cart_ID', $Cart_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+}
+
+class Payment_method
+{
+    public $Payment_ID;
+    public $Payment_name;
+
+    function __construct($Payment_ID, $Payment_name)
+    {
+        $this->Payment_ID = $Payment_ID;
+        $this->Payment_name = $Payment_name;
+    }
+
+    static function getPaymentList()
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT* FROM PAYMENT_METHOD";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $list[] = new Payment_method($item['Payment_ID'], $item['Payment_name']);
+            }
+        }
+
+        return $list;
+    }
+
+    static function getPaymentMethod($Payment_ID)
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT* FROM PAYMENT_METHOD WHERE Payment_ID = :Payment_ID";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Payment_ID', $Payment_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($items)) {
+            $item = $items[0];
+
+            return new Payment_method($item['Payment_ID'], $item['Payment_name']);
+        }
+    }
+}
+
+
+class Shipping_method
+{
+    public $Method_ID;
+    public $Shipping_name;
+    public $Fee;
+
+    function __construct($Method_ID, $Shipping_name, $Fee)
+    {
+        $this->Method_ID = $Method_ID;
+        $this->Shipping_name = $Shipping_name;
+        $this->Fee = $Fee;
+    }
+
+    static function getShippingList()
+    {
+        $db = DB::getInstance();
+        $sql = "SELECT* FROM SHIPPING_METHOD";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $list[] = new Shipping_method($item['Method_ID'], $item['Shipping_name'], $item['Fee']);
+            }
+        }
+
+        return $list;
+    }
+
+    static function getShippingMethod($Method_ID)
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT* FROM SHIPPING_METHOD WHERE Method_ID = :Method_ID";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':Method_ID', $Method_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($items)) {
+            $item = $items[0];
+
+            return new Shipping_method($item['Method_ID'], $item['Shipping_name'], $item['Fee']);
+        }
+    }
+}
+
+class Order_detail
+{
+    public $Detail_ID;
+    public $Order_ID;
+    public $book; //class Book
+    public $Price;
+    public $Quantity;
+    public $Total_cost;
+
+    function __construct($Detail_ID, $Order_ID, $book, $Price, $Quantity, $Total_cost)
+    {
+        $this->Detail_ID = $Detail_ID;
+        $this->Order_ID = $Order_ID;
+        $this->book = $book;
+        $this->Price = $Price;
+        $this->Quantity = $Quantity;
+        $this->Total_cost = $Total_cost;
+    }
+
+    static function transfer_CartDetail_to_OrderDetail($Cart_detail, $Order_ID) //pass a class Cart_detail
+    {
+        $db = DB::getInstance();
+
+        $Book_ID = $Cart_detail->book->Book_ID;
+        $Price = $Cart_detail->Price;
+        $Quantity = $Cart_detail->Quantity;
+        $Total_cost = $Cart_detail->Total_cost;
+
+
+
+        $sql = "INSERT INTO ORDER_DETAIL (Order_ID, Book_ID, Price, Quantity, Total_cost) VALUES (:Order_ID, :Book_ID, :Price, :Quantity, :Total_cost)";
+
+        $stmt = $db->prepare($sql);
+
+        $params = [
+            ':Order_ID' => $Order_ID,
+            ':Book_ID' => $Book_ID,
+            ':Price' => $Price,
+            ':Quantity' => $Quantity,
+            ':Total_cost' => $Total_cost
+        ];
+
+        $stmt->execute($params);
+    }
+
+    static function getOrderDetailList($Order_ID)
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT* FROM ORDER_DETAIL WHERE Order_ID = :Order_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(':Order_ID', $Order_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $book = Book::getBook_useBookID($item['Book_ID']);
+                $list[] = new Order_detail($item['Detail_ID'], $item['Order_ID'], $book, $item['Price'], $item['Quantity'], $item['Total_cost']);
+            }
+        }
+
+        return $list;
+    }
+}
+
+class Order
+{
+    public $Order_ID;
+    public $Customer_ID;
+    public $Address_M;
+    public $Create_date;
+    public $Status_M;
+    public $Total_price;
+    public $Note;
+    public $Shipping_method; //class Shipping_method
+    public $Payment_method; //class Payment_method
+    public $detailList; // class Order_detail
+
+    function __construct($Order_ID, $Customer_ID, $Address_M, $Create_date, $Status_M, $Total_price, $Note, $Shipping_method, $Payment_method, $detailList)
+    {
+        $this->Order_ID = $Order_ID;
+        $this->Customer_ID = $Customer_ID;
+        $this->Address_M = $Address_M;
+        $this->Create_date = $Create_date;
+        $this->Status_M = $Status_M;
+        $this->Total_price = $Total_price;
+        $this->Note = $Note;
+        $this->Shipping_method = $Shipping_method;
+        $this->Payment_method = $Payment_method;
+        $this->detailList = $detailList;
+    }
+
+
+    static function createNewOrder($Customer_ID, $Address_M, $Create_date, $Status_M, $Total_price, $Note, $Shipping_ID, $Payment_ID, $cartInfo) // pass a class Cart
+    {
+        $db = DB::getInstance();
+        $sql = "INSERT INTO ORDER_M (Customer_ID,Address_M,Create_date,Status_M,Total_price,Note,Shipping_ID,Payment_ID) VALUES (:Customer_ID,:Address_M,:Create_date,:Status_M,:Total_price,:Note, :Shipping_ID, :Payment_ID)";
+
+        $stmt = $db->prepare($sql);
+        $params = [
+            ':Customer_ID' => $Customer_ID,
+            ':Address_M' => $Address_M,
+            ':Create_date' => $Create_date,
+            ':Status_M' => $Status_M,
+            ':Total_price' => $Total_price,
+            ':Note' => $Note,
+            ':Shipping_ID' => $Shipping_ID,
+            ':Payment_ID' => $Payment_ID
+        ];
+
+        $stmt->execute($params);
+
+        $getOrderID_sql = "SELECT TOP 1 Order_ID FROM ORDER_M ORDER BY Order_ID DESC";
+        $getOrderID_stmt = $db->prepare($getOrderID_sql);
+        $getOrderID_stmt->execute();
+
+        $Order_ID = $getOrderID_stmt->fetchAll(PDO::FETCH_ASSOC);
+        $Order_ID = $Order_ID[0];
+        $Order_ID = $Order_ID['Order_ID'];
+
+        $Cart_detail_list = $cartInfo->Cart_detail_list;
+
+        if (!empty($Cart_detail_list)) {
+            foreach ($Cart_detail_list as $Cart_detail) {
+                Order_detail::transfer_CartDetail_to_OrderDetail($Cart_detail, $Order_ID);
+            }
+        }
+    }
+
+    static function getOrderPlaced($Customer_ID)
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT* FROM ORDER_M WHERE Customer_ID = :Customer_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindParam(':Customer_ID', $Customer_ID, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+
+                $detailList = Order_detail::getOrderDetailList($item['Order_ID']);
+                $Shipping_method = Shipping_method::getShippingMethod($item['Shipping_ID']);
+                $Payment_method = Payment_method::getPaymentMethod($item['Payment_ID']);
+
+                $list[] = new Order($item['Order_ID'], $item['Customer_ID'], $item['Address_M'], $item['Create_date'], $item['Status_M'], $item['Total_price'], $item['Note'], $Shipping_method, $Payment_method, $detailList);
+            }
+        }
+
+        return $list;
+    }
+
+    static function updateOrderStatus($Order_ID, $Status_M)
+    {
+
+        $db = DB::getInstance();
+
+        $sql = "UPDATE ORDER_M SET Status_M = :Status_M WHERE Order_ID = :Order_ID";
+
+        $stmt = $db->prepare($sql);
+
+        $params = [
+            'Status_M' => $Status_M,
+            'Order_ID' => $Order_ID
+        ];
+
+        $stmt->execute($params);
+    }
+
+    static function getAllOrdersInfo()
+    {
+        $db = DB::getInstance();
+
+        $sql = "SELECT*FROM ORDER_M";
+
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute();
+
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $list = [];
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $Customer = Customer::findAccount_useAccountID($item['Customer_ID']);
+                $Create_date = $item['Create_date'];
+                $Address_M = $item['Address_M'];
+                $detailList = Order_detail::getOrderDetailList($item['Order_ID']);
+                $Total_price = $item['Total_price'];
+                $Payment_method = Payment_method::getPaymentMethod($item['Payment_ID']);
+                $Shipping_method = Shipping_method::getShippingMethod($item['Shipping_ID']);
+                $Order_ID = $item['Order_ID'];
+                $Status_M = $item['Status_M'];
+
+                $info = [
+                    'Customer' => $Customer,
+                    'Create_date' => $Create_date,
+                    'Address_M' => $Address_M,
+                    'detailList' => $detailList,
+                    'Total_price' => $Total_price,
+                    'Payment_method' => $Payment_method,
+                    'Shipping_method' => $Shipping_method,
+                    'Order_ID' => $Order_ID,
+                    'Status_M' => $Status_M
+                ];
+
+                $list[] = $info;
+            }
+        }
+
+        return $list;
     }
 }

@@ -84,5 +84,14 @@ GO
 -- FROM CART INNER JOIN CART_DETAIL ON CART.Cart_ID = CART_DETAIL.Cart_ID
 -- WHERE CART.Customer_ID = 6
 
-SELECT *
-FROM CART_DETAIL
+-- INSERT INTO SHIPPING_METHOD
+--     (Shipping_name, Fee)
+-- VALUES
+--     ('Ninja Van', 10),
+--     ('GHTK', 20),
+--     ('Shopee Express', 30),
+--     ('Grab Express', 50)
+
+SELECT*
+FROM
+    ORDER_M
